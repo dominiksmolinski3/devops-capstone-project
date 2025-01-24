@@ -150,3 +150,16 @@ class TestAccountService(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         updated_account = resp.get_json()
         self.assertEqual(updated_account["name"], "Something Known")
+
+    def test_delete_account(self):
+        """Deletes an existing account"""
+        account = self._create_accounts(1)[0]
+        resp = self.client.delete(f"{BASE_URL}/{account.id}")
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_update_account_not_found(self):
+        """Tests updating a non-existent account"""
+        non_existent_account_id = 9999
+        resp = self.client.put(f"{BASE_URL}/{non_existent_account_id}", json={})
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertIn("Account with id", resp.get_data(as_text=True))
